@@ -4,15 +4,18 @@ import { demoStats, demoUser } from '../Pages/Home';
 import Sidebar from '../Components/Sidebar';
 import { Outlet } from 'react-router-dom';
 import { useUserStore } from '../store/userStore';
+import { getUserProfile } from '../api/userProfile';
+import { useParams } from 'react-router-dom';
 
 const AppLayout = () => {
   const fetchUser = useUserStore((state) => state.fetchUser);
   const [user, setUser] = React.useState(null);
+  const {username} = useParams() // Get the username from the URL parameters
 
   useEffect(() => {
     const loadUser = async () => {
       try {
-        const userData = await fetchUser();
+        const userData = await fetchUser(username); 
         setUser(userData);
       } catch (error) {
         console.error("Error fetching user:", error);

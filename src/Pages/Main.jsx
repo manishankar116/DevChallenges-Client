@@ -27,7 +27,8 @@ export default function Main() {
       }
       else{
         //loggedin user profile
-        data = await fetchUser();
+        data = await getProfile();
+        console.log("Fetched user data:", data);
         challengesData = await getChallenges(data.username);
       }
     }
@@ -41,8 +42,6 @@ export default function Main() {
   };
   loadData();
   }, [fetchUser, isLoggedIn, username]);
-
-  console.log("User Details:", userDetails);
   
   return (
     <div>
