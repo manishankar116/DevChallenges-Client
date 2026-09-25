@@ -6,9 +6,14 @@ const getUserProfile = async (username) => {
     return response.data;
 }
 
-const getProfile = async () => {
-    const response = await api.get("/user-profile/profile-data");  
+const updateProfile = async(data) => {
+    const response = await api.patch('/user-profile/update-profile', data);
     return response.data;
 }
 
-export{ getUserProfile, getProfile};
+/*const getProfile = async () => {
+    const response = await api.get("/user-profile/profile-data");  
+    return response.data;
+}*/
+
+export{ getUserProfile, updateProfile};
