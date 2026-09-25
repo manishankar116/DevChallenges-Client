@@ -10,6 +10,7 @@ import TestEditor from './Components/TestEditor'
 import AppLayout from './Layouts/AppLayout'
 import CreateChallenge from './Components/CreateChallenge'
 import OAuth2Success from './Pages/OAuth2Sucess'
+import UpdateProfile from './Components/UpdateProfile'
 
 function App() {
 
@@ -23,11 +24,10 @@ function App() {
             <Route path="/register" element={<Register />} />
             
             <Route element={<AppLayout />}>
-              <Route path="/profile" element={<Main />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/challenge" element={<Challenge />} />
               <Route path="/profile/:username" element={<Main />} />
+              <Route path="/profile/:username/update-profile" element={<UpdateProfile />} />
               <Route path="/create-challenge" element={<CreateChallenge />} />
+              <Route path="/challenge" element={<Challenge />} />
             </Route>
           </Routes>
         </BrowserRouter>

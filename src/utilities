@@ -1,0 +1,15 @@
+export const getActiveSidebarItem = (pathname, username) => {
+  if (pathname.includes("/update-profile")) {
+    return "Edit Profile";
+  }
+
+  if (pathname.includes("/settings")) {
+    return "Settings";
+  }
+
+  if (pathname === `/profile/${username}`) {
+    return "My Challenges";
+  }
+
+  return "";
+};

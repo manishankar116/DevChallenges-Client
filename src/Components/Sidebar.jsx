@@ -1,4 +1,6 @@
 import React from 'react'
+import { useLocation, useNavigate } from 'react-router-dom';
+import { getActiveSidebarItem } from '../utilities';
 
 
 const IconPlus = (props) => (
@@ -29,14 +31,19 @@ const IconSettings = (props) => (
   </svg>
 );
 
-const Sidebar = ({ user, stats, activeItem = "My Challenges" }) => {
-  console.log("Sidebar user:", user);
+const Sidebar = ({ user, stats, isLoggedIn }) => {
+  const navigate = useNavigate();
+  const location = useLocation();
   const navItems = [
-    { label: "My Challenges", icon: IconFile },
-    { label: "Edit Profile", icon: IconUser },
+    { label: "My Challenges", icon: IconFile, link: `/profile/${user.username}`},
+    { label: "Edit Profile", icon: IconUser, link: `/profile/${user.username}/update-profile`},
     { label: "Settings", icon: IconSettings },
   ];
 
+  const activeItem = getActiveSidebarItem(
+    location.pathname, user?.username
+  );
+  
   return (
     <aside className="fixed left-0 top-16 hidden h-[calc(100vh-4rem)] w-72 shrink-0 flex-col overflow-y-auto border-r border-slate-200 bg-slate-50 px-6 py-8 md:flex">      
     <div className="flex flex-col items-center text-center">
@@ -69,6 +76,7 @@ const Sidebar = ({ user, stats, activeItem = "My Challenges" }) => {
 
       {user.isOwner && (
         <button
+        onClick={() => navigate("/create-challenge")}
           type="button"
           className="mt-6 flex items-center justify-center gap-2 rounded-xl bg-blue-600 py-3 text-sm font-semibold text-white hover:bg-blue-700"
         >
@@ -79,11 +87,12 @@ const Sidebar = ({ user, stats, activeItem = "My Challenges" }) => {
 
       {user.isOwner && (
         <nav className="mt-6 space-y-1">
-          {navItems.map(({ label, icon: Icon }) => {
+          {navItems.map(({ label, icon: Icon, link }) => {
             const active = label === activeItem;
 
             return (
               <button
+                onClick={() => navigate(link)}
                 key={label}
                 type="button"
                 className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-medium transition-colors ${

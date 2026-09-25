@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import {getUserProfile, getProfile} from "../api/userProfile";
+import {getUserProfile} from "../api/userProfile";
 
 export const useUserStore = create((set) => ({
   user: null,
@@ -10,7 +10,7 @@ export const useUserStore = create((set) => ({
     set({ loading: true, error: null });
 
     try {
-      const data = username ? await getUserProfile(username) : await getProfile();
+      const data =  await getUserProfile(username);
 
       set({
         user: data,

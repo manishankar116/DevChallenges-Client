@@ -3,8 +3,8 @@ import { demoChallenges, demoStats, demoUser } from './Home';
 import { useUserStore } from '../store/userStore';
 import { useEffect } from 'react';
 import { getChallenges } from '../api/challenge';
-import {useParams} from 'react-router-dom';
-import {getUserProfile, getProfile} from '../api/userProfile';
+import {Navigate, useParams} from 'react-router-dom';
+import { getUserProfile} from '../api/userProfile';
 import useAuthStore from '../store/useAuthStore';
 import Feed from '../Components/Feed';
 
@@ -20,24 +20,22 @@ export default function Main() {
     let data;
     let challengesData;
     try {
-      if(username) {
-        data = await getUserProfile(username);
-        challengesData = await getChallenges(username);
-        
+      if(!username) {
+        <Navigate to={"/login"} replace />
       }
       else{
         //loggedin user profile
-        data = await getProfile();
-        console.log("Fetched user data:", data);
+        data = await getUserProfile(username);
         challengesData = await getChallenges(data.username);
       }
+
+      setChallenges(challengesData);
+      setUserDetails(data ? { ...data, isLoggedIn } : null);
+
     }
     catch (error) {
       console.error("Error fetching user data:", error);
     }
-
-    setChallenges(challengesData);
-    setUserDetails(data ? { ...data, isLoggedIn } : null);
     
   };
   loadData();
