@@ -304,7 +304,7 @@ function ChallengeCard({ challenge }) {
         {challenge.views}
       </div>
     </div>
-
+      <p>Hi</p>
     <button
       type="button"
       className="flex items-center gap-1.5 rounded-lg bg-blue-50 px-4 py-2.5 text-sm font-semibold text-blue-600 transition-colors hover:bg-blue-100"
