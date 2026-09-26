@@ -14,6 +14,12 @@ export default function Main() {
   const fetchUser = useUserStore((state) => state.fetchUser);
   const isLoggedIn = useAuthStore((state) => state.isAuthenticated);
   const { username } = useParams();
+
+  const handleDeleteChallenge = (challengeId) => {
+    setChallenges((currentChallenges) =>
+      currentChallenges.filter((challenge) => challenge.challengeId !== challengeId)
+    );
+  };
   
   useEffect(() => { 
   const loadData = async () => {
@@ -43,7 +49,7 @@ export default function Main() {
   
   return (
     <div>
-      <Feed challenges={challenges ? challenges : demoChallenges} totalCount={12} pageSize={5} />
+      <Feed challenges={challenges ? challenges : demoChallenges} totalCount={12} pageSize={5} onDelete={handleDeleteChallenge} />
     </div>
   );
 }

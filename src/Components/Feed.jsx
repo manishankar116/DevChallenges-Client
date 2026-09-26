@@ -8,7 +8,7 @@ const IconChevronDown = (props) => (
   </svg>
 );
 
-const Feed = ({ challenges, totalCount, pageSize = 5 }) => {
+const Feed = ({ challenges, totalCount, pageSize = 5, onDelete }) => {
     const [page, setPage] = useState(1);
     const [sortBy, setSortBy] = useState("Latest");
     const totalPages = Math.ceil(totalCount / pageSize);
@@ -39,7 +39,7 @@ const Feed = ({ challenges, totalCount, pageSize = 5 }) => {
 
       <div className="mt-6 space-y-4">
         {challenges.map((c, i) => (
-          <ChallengeCard key={i} challenge={c} />
+          <ChallengeCard key={c.challengeId ?? i} challenge={c} onDelete={onDelete} />
         ))}
       </div>
 
