@@ -11,6 +11,7 @@ import AppLayout from './Layouts/AppLayout'
 import CreateChallenge from './Components/CreateChallenge'
 import OAuth2Success from './Pages/OAuth2Sucess'
 import UpdateProfile from './Components/UpdateProfile'
+import UpdateChallenge from './Pages/UpdateChallenge'
 
 function App() {
 
@@ -28,6 +29,8 @@ function App() {
               <Route path="/profile/:username/update-profile" element={<UpdateProfile />} />
               <Route path="/create-challenge" element={<CreateChallenge />} />
               <Route path="/challenge" element={<Challenge />} />
+              <Route path='/update-challenge/:id' element={ <UpdateChallenge /> } />
+              <Route path='/update=profile/:id' element={ <UpdateChallenge /> } />
             </Route>
           </Routes>
         </BrowserRouter>

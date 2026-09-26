@@ -6,7 +6,7 @@ const getChallenges = async (username) => {
 }
 
 const getChallengeById = async (challengeId) => {
-    const response = await api.get(`/challenge/get-challenge-by-id/${challengeId}`);
+    const response = await api.get(`/challenge/get-challenge/${challengeId}`);
     return response.data;
 }
 
@@ -15,4 +15,9 @@ const createChallenge = async (challengeData) => {
     return response.data;
 }
 
-export { getChallenges, getChallengeById, createChallenge };
+const updateChallenge = async (challenge) => {
+    const response = await api.patch('/challenge/update-challenge', challenge)
+    return response.data
+}
+
+export { getChallenges, getChallengeById, createChallenge, updateChallenge};
