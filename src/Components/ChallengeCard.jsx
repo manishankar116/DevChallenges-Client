@@ -1,5 +1,6 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom';
+import { deleteChallenge } from '../api/challenge';
 
 const IconEye = (props) => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
@@ -15,8 +16,18 @@ const IconArrowRight = (props) => (
   </svg>
 );
 
-const ChallengeCard = ({challenge}) => {
+const ChallengeCard = ({challenge, onDelete}) => {
   const navigate = useNavigate();
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const handleDelete = async () => {
+    try {
+      await deleteChallenge(challenge.challengeId);
+      onDelete?.(challenge.challengeId);
+      setIsDeleteDialogOpen(false);
+    } catch (error) {
+      console.error('Error deleting challenge:', error);
+    }
+  }
   const handleEdit = (id) => {
     navigate(`/update=profile/${id}`);
   }
@@ -65,8 +76,39 @@ const ChallengeCard = ({challenge}) => {
               <IconArrowRight className="h-3.5 w-3.5" />
               </button>
               <p onClick={() => handleEdit(challenge.challengeId)}>Edit</p>
+              <button type="button" onClick={() => setIsDeleteDialogOpen(true)}>Delete</button>
             </div>
         </div>
+        {isDeleteDialogOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+            <div
+              role="alertdialog"
+              aria-modal="true"
+              aria-labelledby="delete-challenge-title"
+              className="w-full max-w-sm rounded-xl bg-white p-6 shadow-xl"
+            >
+              <h2 id="delete-challenge-title" className="text-lg font-semibold text-slate-900">
+                Are you sure to delete the challenge
+              </h2>
+              <div className="mt-6 flex justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => setIsDeleteDialogOpen(false)}
+                  className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleDelete}
+                  className="rounded-lg bg-rose-600 px-4 py-2 text-sm font-semibold text-white hover:bg-rose-700"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
     </div>
   )
 }

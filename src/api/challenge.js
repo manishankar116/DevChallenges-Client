@@ -20,4 +20,9 @@ const updateChallenge = async (challenge) => {
     return response.data
 }
 
-export { getChallenges, getChallengeById, createChallenge, updateChallenge};
+const deleteChallenge = async (challengeId) => {
+    const response = await api.delete(`/challenge/delete-challenge/${challengeId}`);
+    return response.data;
+}
+
+export { getChallenges, getChallengeById, createChallenge, updateChallenge, deleteChallenge};
