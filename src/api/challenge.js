@@ -25,4 +25,9 @@ const deleteChallenge = async (challengeId) => {
     return response.data;
 }
 
-export { getChallenges, getChallengeById, createChallenge, updateChallenge, deleteChallenge};
+const recordView = async (challengeId) => {
+    const response = await api.post(`/challenge/${challengeId}/view`);
+    return response.data;
+}
+
+export { getChallenges, getChallengeById, createChallenge, updateChallenge, deleteChallenge, recordView};
