@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import { deleteChallenge } from '../api/challenge';
 
@@ -70,6 +70,7 @@ const ChallengeCard = ({challenge, onDelete}) => {
             <div className=' flex items-center gap-3'>
               <button
               type="button"
+              onClick={() => navigate(`/challenge/${challenge.challengeId}`)}
               className="flex items-center gap-1.5 rounded-lg bg-blue-50 px-4 py-2.5 text-sm font-semibold text-blue-600 transition-colors hover:bg-blue-100"
               >
               View
