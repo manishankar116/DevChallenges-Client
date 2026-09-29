@@ -2,11 +2,13 @@ import React from 'react'
 import axios from 'axios';
 import useAuthStore from '../store/useAuthStore';
 import { googleAuth } from '../api/auth';
+import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
    const [email, setEmail] = React.useState('');
    const [password, setPassword] = React.useState('');
    const { login } = useAuthStore();
+   const navigate = useNavigate();
 
    const handleSubmit = (e) => {
       e.preventDefault();
@@ -20,7 +22,7 @@ const Login = () => {
          login(response.data, response.data.token);
          window.alert("Login successful!");
          localStorage.setItem('token', response.data.token);
-         window.location.href = "/profile";
+         navigate(`/profile/${encodeURIComponent(response.data.username)}`);
          //localStorage.setItem('user', response.data.username);
 
          
