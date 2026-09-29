@@ -15,7 +15,7 @@ const IconBell = (props) => (
   </svg>
 );
 
-const Navbar = ({ user, onMenuClick  }) => {
+const Navbar = ({ user, onMenuClick, isMenuOpen }) => {
   return (
     <header className="fixed left-0 right-0 top-0 z-50 flex h-16 shrink-0 items-center justify-between border-b border-slate-200 bg-white px-6">      <div className="flex items-center gap-2">
         <svg
@@ -35,7 +35,9 @@ const Navbar = ({ user, onMenuClick  }) => {
           type="button"
           onClick={onMenuClick}
           className="mr-3 rounded-lg p-2 text-slate-600 hover:bg-slate-100 md:hidden"
-          aria-label="Open menu">
+          aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+          aria-expanded={isMenuOpen}
+          aria-controls="profile-sidebar">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
