@@ -1,6 +1,7 @@
 import React from 'react'
 import axios from 'axios';
 import useAuthStore from '../store/useAuthStore';
+import { googleAuth } from '../api/auth';
 
 const Login = () => {
    const [email, setEmail] = React.useState('');
@@ -85,12 +86,7 @@ const Login = () => {
                   Sign in
                </button>
 
-               <button
-                  onClick={() => {
-                     window.location.href =
-                           "http://localhost:8080/oauth2/authorization/google";
-                  }}
-                  >
+               <button type="button" onClick={googleAuth}>
                   Continue with Google
                </button>               
 
