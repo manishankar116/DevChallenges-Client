@@ -31,7 +31,7 @@ const IconSettings = (props) => (
   </svg>
 );
 
-const Sidebar = ({ user, stats, isLoggedIn }) => {
+const Sidebar = ({ user, stats, isLoggedIn, isOpen, onClose }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const navItems = [
@@ -45,7 +45,12 @@ const Sidebar = ({ user, stats, isLoggedIn }) => {
   );
   
   return (
-    <aside className="fixed left-0 top-16 hidden h-[calc(100vh-4rem)] w-72 shrink-0 flex-col overflow-y-auto border-r border-slate-200 bg-slate-50 px-6 py-8 md:flex">      
+    <aside
+      id="profile-sidebar"
+      className={`fixed left-0 top-16 z-40 flex h-[calc(100vh-4rem)] w-72 max-w-[calc(100vw-3rem)] shrink-0 flex-col overflow-y-auto border-r border-slate-200 bg-slate-50 px-6 py-8 transition-transform md:z-40 md:translate-x-0 ${
+        isOpen ? "translate-x-0" : "-translate-x-full"
+      }`}
+    >
     <div className="flex flex-col items-center text-center">
         <img
           src={
@@ -76,7 +81,10 @@ const Sidebar = ({ user, stats, isLoggedIn }) => {
 
       {user.isOwner && (
         <button
-        onClick={() => navigate("/create-challenge")}
+          onClick={() => {
+            navigate("/create-challenge");
+            onClose();
+          }}
           type="button"
           className="mt-6 flex items-center justify-center gap-2 rounded-xl bg-blue-600 py-3 text-sm font-semibold text-white hover:bg-blue-700"
         >
@@ -92,7 +100,10 @@ const Sidebar = ({ user, stats, isLoggedIn }) => {
 
             return (
               <button
-                onClick={() => navigate(link)}
+                onClick={() => {
+                  navigate(link);
+                  onClose();
+                }}
                 key={label}
                 type="button"
                 className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-medium transition-colors ${
