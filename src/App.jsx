@@ -9,6 +9,7 @@ import CreateChallenge from './Components/CreateChallenge'
 import OAuth2Success from './Pages/OAuth2Sucess'
 import UpdateProfile from './Components/UpdateProfile'
 import UpdateChallenge from './Pages/UpdateChallenge'
+import LandingPage from './LandingPage/LandingPage'
 
 function App() {
 
@@ -20,6 +21,7 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/oauth2/success" element={<OAuth2Success />} />
             <Route path="/register" element={<Register />} />
+            <Route path='/' element={<LandingPage />} />
             
             <Route element={<AppLayout />}>
               <Route path="/profile/:username" element={<Main />} />
