@@ -2,7 +2,7 @@ import React, { useEffect } from 'react'
 import Navbar from '../Components/Navbar';
 import { demoUser } from '../Pages/Home';
 import Sidebar from '../Components/Sidebar';
-import { Navigate, Outlet } from 'react-router-dom';
+import { Outlet } from 'react-router-dom';
 import { useUserStore } from '../store/userStore';
 import { useParams } from 'react-router-dom';
 import useAuthStore from '../store/useAuthStore';
@@ -11,41 +11,51 @@ import { getStats } from '../api/userProfile';
 const AppLayout = () => {
   const fetchUser = useUserStore((state) => state.fetchUser);
   const isLoggedIn = useAuthStore((state) => state.isAuthenticated);
+  const authUser = useAuthStore((state) => state.user);
   const [user, setUser] = React.useState(null);
   const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
-  const {username} = useParams() // Get the username from the URL parameters
+  const {username} = useParams();
+  const profileUsername = username || (isLoggedIn ? authUser?.username : undefined);
+  const fallbackUser = authUser &&
+    (!username || authUser.username?.toLowerCase() === username.toLowerCase())
+      ? { ...authUser, isOwner: Boolean(isLoggedIn) }
+      : demoUser;
   const [userStats, setUserStats] = React.useState(null);
 
   useEffect(() => {
     const loadUser = async () => {
+      if (!profileUsername) {
+        setUser(null);
+        return;
+      }
+
       try {
-        if(username){
-          const userData = await fetchUser(username); 
-          setUser(userData);
-        }
-        else{
-          return <Navigate to={"/login"} replace />
-        }
+        const userData = await fetchUser(profileUsername);
+        const isOwner = Boolean(
+          isLoggedIn && authUser?.username &&
+          authUser.username.toLowerCase() === profileUsername.toLowerCase()
+        );
+        setUser(userData ? { ...userData, isOwner } : null);
       } catch (error) {
         console.error("Error fetching user:", error);
       }
     };
 
     loadUser();
-  }, [fetchUser, username]);
+  }, [authUser?.username, fetchUser, isLoggedIn, profileUsername]);
 
   useEffect(() => {
     let isCurrent = true;
 
     const loadStats = async () => {
-      if (!username) {
+      if (!profileUsername) {
         setUserStats(null);
         return;
       }
 
       setUserStats(null);
       try {
-        const stats = await getStats(username);
+        const stats = await getStats(profileUsername);
         if (isCurrent) setUserStats(stats);
       } catch (error) {
         console.error("Error fetching user stats:", error);
@@ -57,7 +67,7 @@ const AppLayout = () => {
     return () => {
       isCurrent = false;
     };
-  }, [username]);
+  }, [profileUsername]);
 
   const sidebarStats = userStats
     ? [
@@ -71,7 +81,7 @@ const AppLayout = () => {
     <div className="min-h-screen bg-white">
 
       <Navbar
-        user={user ? user : demoUser}
+        user={user || fallbackUser}
         onMenuClick={() => setIsSidebarOpen((isOpen) => !isOpen)}
         isMenuOpen={isSidebarOpen}
       />
@@ -84,7 +94,7 @@ const AppLayout = () => {
         />
       )}
       <Sidebar
-        user={user && user !== null ? user : demoUser}
+        user={user || fallbackUser}
         stats={sidebarStats}
         isLoggedIn={isLoggedIn}
         isOpen={isSidebarOpen}
