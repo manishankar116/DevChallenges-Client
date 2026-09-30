@@ -13,8 +13,12 @@ export default function Main() {
   const [challenges, setChallenges] = React.useState(demoChallenges);
   const fetchUser = useUserStore((state) => state.fetchUser);
   const isLoggedIn = useAuthStore((state) => state.isAuthenticated);
-  const authUser = useAuthStore((state) => state.user);
+  const loggedInUsername = useAuthStore((state) => state.user?.username);
   const { username } = useParams();
+  const canManageChallenges = Boolean(
+    isLoggedIn && loggedInUsername && username &&
+    loggedInUsername.toLowerCase() === username.toLowerCase()
+  );
 
   const handleDeleteChallenge = (challengeId) => {
     setChallenges((currentChallenges) =>
@@ -55,7 +59,8 @@ export default function Main() {
         totalCount={12}
         pageSize={5}
         onDelete={handleDeleteChallenge}
-        canManageChallenges={isLoggedIn && authUser?.username === username}
+        canManageChallenges={canManageChallenges}
+        profileUsername={username}
       />
     </div>
   );

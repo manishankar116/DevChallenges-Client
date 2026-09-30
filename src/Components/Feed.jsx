@@ -8,7 +8,7 @@ const IconChevronDown = (props) => (
   </svg>
 );
 
-const Feed = ({ challenges, totalCount, pageSize = 5, onDelete, canManageChallenges = false }) => {
+const Feed = ({ challenges, totalCount, pageSize = 5, onDelete, canManageChallenges, profileUsername }) => {
     const [page, setPage] = useState(1);
     const [sortBy, setSortBy] = useState("Latest");
     const totalPages = Math.ceil(totalCount / pageSize);
@@ -44,6 +44,7 @@ const Feed = ({ challenges, totalCount, pageSize = 5, onDelete, canManageChallen
             challenge={c}
             onDelete={onDelete}
             canManage={canManageChallenges}
+            profileUsername={profileUsername}
           />
         ))}
       </div>
