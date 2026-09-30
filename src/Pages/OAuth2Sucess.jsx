@@ -24,7 +24,7 @@ export default function OAuth2Success() {
 
         login(userData, token);
 
-        navigate("/profile", { replace: true });
+        navigate(`/profile/${encodeURIComponent(username)}`, { replace: true });
 
     }, [login, navigate, searchParams]);
 
