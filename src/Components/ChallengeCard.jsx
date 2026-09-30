@@ -17,10 +17,12 @@ const IconArrowRight = (props) => (
   </svg>
 );
 
-const ChallengeCard = ({challenge, onDelete}) => {
+const ChallengeCard = ({challenge, onDelete, canManage, profileUsername}) => {
   const navigate = useNavigate();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const handleDelete = async () => {
+    if (!canManage) return;
+
     try {
       await deleteChallenge(challenge.challengeId);
       onDelete?.(challenge.challengeId);
@@ -30,6 +32,7 @@ const ChallengeCard = ({challenge, onDelete}) => {
     }
   }
   const handleEdit = (id) => {
+    if (!canManage) return;
     navigate(`/update=profile/${id}`);
   }
 
@@ -71,21 +74,27 @@ const ChallengeCard = ({challenge, onDelete}) => {
             <div className=' flex items-center gap-3'>
               <button
               type="button"
-              onClick={() => navigate(`/challenge/${challenge.challengeId}`)}
+              onClick={() => navigate(`/challenge/${challenge.challengeId}`, { state: { profileUsername } })}
               className="flex items-center gap-1.5 rounded-lg bg-blue-50 px-4 py-2.5 text-sm font-semibold text-blue-600 transition-colors hover:bg-blue-100"
               >
               View
               <IconArrowRight className="h-3.5 w-3.5" />
               </button>
-              <p onClick={() => handleEdit(challenge.challengeId)}>Edit</p>
-              <button type="button" onClick={() => setIsDeleteDialogOpen(true)}>Delete</button>
+              {canManage && (
+                <>
+                  <button type="button" onClick={() => handleEdit(challenge.challengeId)}>Edit</button>
+                  <button type="button" onClick={() => setIsDeleteDialogOpen(true)}>Delete</button>
+                </>
+              )}
             </div>
         </div>
-        <DeleteChallengeDialog
-          isOpen={isDeleteDialogOpen}
-          onCancel={() => setIsDeleteDialogOpen(false)}
-          onConfirm={handleDelete}
-        />
+        {canManage && (
+          <DeleteChallengeDialog
+            isOpen={isDeleteDialogOpen}
+            onCancel={() => setIsDeleteDialogOpen(false)}
+            onConfirm={handleDelete}
+          />
+        )}
     </div>
   )
 }

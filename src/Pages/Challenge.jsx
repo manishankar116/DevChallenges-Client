@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import DOMPurify from "dompurify";
-import { deleteChallenge, getChallengeById } from "../api/challenge";
+import { deleteChallenge, getChallengeById, recordView } from "../api/challenge";
 import DeleteChallengeDialog from "../Components/DeleteChallengeDialog";
+import useAuthStore from "../store/useAuthStore";
 import {
   ArrowLeft,
   CalendarDays,
@@ -19,6 +20,14 @@ import {
 const Challenge = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const loggedInUsername = useAuthStore((state) => state.user?.username);
+  const profileUsername = location.state?.profileUsername;
+  const canManage = Boolean(
+    isAuthenticated && loggedInUsername && profileUsername &&
+    loggedInUsername.toLowerCase() === profileUsername.toLowerCase()
+  );
   const [challenge, setChallenge] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
@@ -35,7 +44,12 @@ const Challenge = () => {
       setError("");
       try {
         const data = await getChallengeById(id);
-        if (isCurrent) setChallenge(data);
+        if (isCurrent) {
+          setChallenge(data);
+          recordView(id).catch((viewError) => {
+            console.error("Unable to record challenge view:", viewError);
+          });
+        }
       } catch {
         if (isCurrent) setError("Unable to load this challenge.");
       } finally {
@@ -51,6 +65,8 @@ const Challenge = () => {
   }, [id]);
 
   const handleDelete = async () => {
+    if (!canManage) return;
+
     setIsDeleting(true);
     setError("");
     try {
@@ -136,7 +152,7 @@ const Challenge = () => {
             </div>
 
             {/* Actions */}
-            <div className="flex shrink-0 gap-2">
+            {canManage && <div className="flex shrink-0 gap-2">
               <button
                 type="button"
                 onClick={() => navigate(`/update-challenge/${challenge.challengeId || id}`)}
@@ -154,7 +170,7 @@ const Challenge = () => {
                 <Trash2 size={13} />
                 Delete
               </button>
-            </div>
+            </div>}
           </div>
         </div>
         {error && <p role="alert" className="mb-4 text-sm text-red-600">{error}</p>}
@@ -281,12 +297,14 @@ const Challenge = () => {
           </div>
         </section>
       </div>
-      <DeleteChallengeDialog
-        isOpen={isDeleteDialogOpen}
-        isDeleting={isDeleting}
-        onCancel={() => setIsDeleteDialogOpen(false)}
-        onConfirm={handleDelete}
-      />
+      {canManage && (
+        <DeleteChallengeDialog
+          isOpen={isDeleteDialogOpen}
+          isDeleting={isDeleting}
+          onCancel={() => setIsDeleteDialogOpen(false)}
+          onConfirm={handleDelete}
+        />
+      )}
     </div>
   );
 };
