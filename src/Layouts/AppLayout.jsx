@@ -1,11 +1,12 @@
 import React, { useEffect } from 'react'
 import Navbar from '../Components/Navbar';
-import { demoStats, demoUser } from '../Pages/Home';
+import { demoUser } from '../Pages/Home';
 import Sidebar from '../Components/Sidebar';
 import { Navigate, Outlet } from 'react-router-dom';
 import { useUserStore } from '../store/userStore';
 import { useParams } from 'react-router-dom';
 import useAuthStore from '../store/useAuthStore';
+import { getStats } from '../api/userProfile';
 
 const AppLayout = () => {
   const fetchUser = useUserStore((state) => state.fetchUser);
@@ -13,6 +14,7 @@ const AppLayout = () => {
   const [user, setUser] = React.useState(null);
   const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
   const {username} = useParams() // Get the username from the URL parameters
+  const [userStats, setUserStats] = React.useState(null);
 
   useEffect(() => {
     const loadUser = async () => {
@@ -30,7 +32,40 @@ const AppLayout = () => {
     };
 
     loadUser();
-  }, [fetchUser]);
+  }, [fetchUser, username]);
+
+  useEffect(() => {
+    let isCurrent = true;
+
+    const loadStats = async () => {
+      if (!username) {
+        setUserStats(null);
+        return;
+      }
+
+      setUserStats(null);
+      try {
+        const stats = await getStats(username);
+        if (isCurrent) setUserStats(stats);
+      } catch (error) {
+        console.error("Error fetching user stats:", error);
+        if (isCurrent) setUserStats(null);
+      }
+    };
+
+    loadStats();
+    return () => {
+      isCurrent = false;
+    };
+  }, [username]);
+
+  const sidebarStats = userStats
+    ? [
+        { value: userStats.challengeCount ?? 0, label: "Challenges" },
+        { value: userStats.totalViews ?? 0, label: "Views" },
+        { value: userStats.uniqueTagCount ?? 0, label: "Tags" },
+      ]
+    : [];
 
   return (
     <div className="min-h-screen bg-white">
@@ -50,7 +85,7 @@ const AppLayout = () => {
       )}
       <Sidebar
         user={user && user !== null ? user : demoUser}
-        stats={demoStats}
+        stats={sidebarStats}
         isLoggedIn={isLoggedIn}
         isOpen={isSidebarOpen}
         onClose={() => setIsSidebarOpen(false)}
