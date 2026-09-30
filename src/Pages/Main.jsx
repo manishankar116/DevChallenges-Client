@@ -13,6 +13,7 @@ export default function Main() {
   const [challenges, setChallenges] = React.useState(demoChallenges);
   const fetchUser = useUserStore((state) => state.fetchUser);
   const isLoggedIn = useAuthStore((state) => state.isAuthenticated);
+  const authUser = useAuthStore((state) => state.user);
   const { username } = useParams();
 
   const handleDeleteChallenge = (challengeId) => {
@@ -49,7 +50,13 @@ export default function Main() {
   
   return (
     <div>
-      <Feed challenges={challenges ? challenges : demoChallenges} totalCount={12} pageSize={5} onDelete={handleDeleteChallenge} />
+      <Feed
+        challenges={challenges ? challenges : demoChallenges}
+        totalCount={12}
+        pageSize={5}
+        onDelete={handleDeleteChallenge}
+        canManageChallenges={isLoggedIn && authUser?.username === username}
+      />
     </div>
   );
 }
