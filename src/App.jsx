@@ -2,7 +2,7 @@ import './App.css'
 import Login from './Pages/Login'
 import Register from './Pages/Register'
 import Challenge from './Pages/Challenge'
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, Navigate, Outlet, Route, Routes } from 'react-router-dom'
 import Main from './Pages/Main'
 import AppLayout from './Layouts/AppLayout'
 import CreateChallenge from './Components/CreateChallenge'
@@ -10,6 +10,13 @@ import OAuth2Success from './Pages/OAuth2Sucess'
 import UpdateProfile from './Components/UpdateProfile'
 import UpdateChallenge from './Pages/UpdateChallenge'
 import LandingPage from './LandingPage/LandingPage'
+import useAuthStore from './store/useAuthStore'
+
+function RequireAuth() {
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
+
+  return isAuthenticated ? <Outlet /> : <Navigate to="/login" replace />
+}
 
 function App() {
 
@@ -23,9 +30,14 @@ function App() {
             <Route path="/register" element={<Register />} />
             <Route path='/' element={<LandingPage />} />
             
+            <Route element={<RequireAuth />}>
+              <Route element={<AppLayout />}>
+                <Route path="/profile/:username" element={<Main />} />
+                <Route path="/profile/:username/update-profile" element={<UpdateProfile />} />
+              </Route>
+            </Route>
+
             <Route element={<AppLayout />}>
-              <Route path="/profile/:username" element={<Main />} />
-              <Route path="/profile/:username/update-profile" element={<UpdateProfile />} />
               <Route path="/create-challenge" element={<CreateChallenge />} />
               <Route path="/challenge/:id" element={<Challenge />} />
               <Route path='/update-challenge/:id' element={ <UpdateChallenge /> } />

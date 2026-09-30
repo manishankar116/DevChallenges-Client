@@ -1,12 +1,14 @@
 import React from 'react';
 import { googleAuth, login as loginUser } from '../api/auth';
 import useAuthStore from '../store/useAuthStore';
+import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const { login } = useAuthStore();
+  const navigate = useNavigate();
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -16,7 +18,7 @@ const Login = () => {
       const userData = await loginUser(email, password);
       login(userData, userData.token);
       localStorage.setItem('token', userData.token);
-      window.location.href = '/profile';
+      navigate(`/profile/${encodeURIComponent(userData.username)}`);
     } catch {
       window.alert('Login failed. Please check your details and try again.');
     } finally {
@@ -113,7 +115,7 @@ const Login = () => {
                 <input
                   id="email"
                   name="email"
-                  type="email"
+                  type="text"
                   autoComplete="email"
                   placeholder="you@example.com"
                   required
