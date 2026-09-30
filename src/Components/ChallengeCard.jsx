@@ -17,7 +17,7 @@ const IconArrowRight = (props) => (
   </svg>
 );
 
-const ChallengeCard = ({challenge, onDelete}) => {
+const ChallengeCard = ({challenge, onDelete, canManage = false}) => {
   const navigate = useNavigate();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const handleDelete = async () => {
@@ -77,8 +77,12 @@ const ChallengeCard = ({challenge, onDelete}) => {
               View
               <IconArrowRight className="h-3.5 w-3.5" />
               </button>
-              <p onClick={() => handleEdit(challenge.challengeId)}>Edit</p>
-              <button type="button" onClick={() => setIsDeleteDialogOpen(true)}>Delete</button>
+              {canManage && (
+                <>
+                  <button type="button" onClick={() => handleEdit(challenge.challengeId)}>Edit</button>
+                  <button type="button" onClick={() => setIsDeleteDialogOpen(true)}>Delete</button>
+                </>
+              )}
             </div>
         </div>
         <DeleteChallengeDialog
