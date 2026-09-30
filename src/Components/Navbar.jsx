@@ -1,4 +1,5 @@
-import React from 'react'
+import { useNavigate } from 'react-router-dom';
+import useAuthStore from '../store/useAuthStore';
 
 
 const IconSearch = (props) => (
@@ -16,6 +17,18 @@ const IconBell = (props) => (
 );
 
 const Navbar = ({ user, onMenuClick, isMenuOpen }) => {
+  const navigate = useNavigate();
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const authUser = useAuthStore((state) => state.user);
+  const logout = useAuthStore((state) => state.logout);
+  const displayName = authUser?.fullname || authUser?.fullName || user?.fullname || user?.fullName || authUser?.username || user?.username || 'User';
+
+  const handleLogout = () => {
+    logout();
+    localStorage.removeItem('token');
+    navigate('/login', { replace: true });
+  };
+
   return (
     <header className="fixed left-0 right-0 top-0 z-50 flex h-16 shrink-0 items-center justify-between border-b border-slate-200 bg-white px-6">      <div className="flex items-center gap-2">
         <svg
@@ -80,23 +93,30 @@ const Navbar = ({ user, onMenuClick, isMenuOpen }) => {
           <IconBell className="h-5 w-5" />
         </button>
 
-        {user.isLoggedIn ? (
-          <button type="button" className="flex items-center gap-2">
+        {isAuthenticated ? (
+          <div className="flex items-center gap-3">
             <img
-              src="https://api.dicebear.com/7.x/avataaars/svg?seed=mani-shankar"
-              alt={user.fullname}
+              src={authUser?.avatarUrl || user?.avatarUrl || 'https://api.dicebear.com/7.x/avataaars/svg?seed=mani-shankar'}
+              alt={displayName}
               className="h-9 w-9 rounded-full object-cover"
             />
 
             <span className="text-sm font-medium text-slate-700">
-              {user.fullname}
+              {displayName}
             </span>
 
-            <IconChevronDown className="h-4 w-4 text-slate-400" />
-          </button>
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-100"
+            >
+              Logout
+            </button>
+          </div>
         ) : (
           <button
             type="button"
+            onClick={() => navigate('/login')}
             className="flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-3 py-2 text-sm font-semibold text-white hover:bg-blue-700"
           >
             Login
