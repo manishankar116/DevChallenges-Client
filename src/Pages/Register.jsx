@@ -1,12 +1,39 @@
 import React from 'react';
-import { googleAuth, register as registerUser } from '../api/auth';
+import { checkUsernameAvailability, googleAuth, register as registerUser } from '../api/auth';
 
 const Register = () => {
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
   const [confirmPassword, setConfirmPassword] = React.useState('');
   const [username, setUsername] = React.useState('');
+  const [usernameStatus, setUsernameStatus] = React.useState('idle');
   const [fullname, setFullname] = React.useState('');
+
+  React.useEffect(() => {
+    if (!username.trim()) {
+      return undefined;
+    }
+
+    let active = true;
+    const timeoutId = window.setTimeout(async () => {
+      setUsernameStatus('checking');
+      try {
+        const available = await checkUsernameAvailability(username);
+        if (active) {
+          setUsernameStatus(available ? 'available' : 'taken');
+        }
+      } catch {
+        if (active) {
+          setUsernameStatus('error');
+        }
+      }
+    }, 350);
+
+    return () => {
+      active = false;
+      window.clearTimeout(timeoutId);
+    };
+  }, [username]);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -19,13 +46,23 @@ const Register = () => {
       await registerUser(fullname, username, email, password);
       window.alert('Registration successful!');
       window.location.href = '/login';
-    } catch {
+    } catch (error) {
+      if (error?.response?.data === 'Username already exists') {
+        setUsernameStatus('taken');
+        return;
+      }
       window.alert('Registration failed. Please try again.');
     }
   };
 
   const inputClassName = 'w-full rounded-lg border border-slate-300 bg-white px-3.5 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100';
   const labelClassName = 'mb-1.5 block text-sm font-semibold text-slate-700';
+  const usernameStatusMessage = {
+    checking: 'Checking username availability...',
+    available: 'Username is available',
+    taken: 'Username already exists',
+    error: 'Unable to check username. Please try again.',
+  }[usernameStatus];
 
   return (
     <main className="min-h-screen bg-[#f5f7fc] px-4 py-6 sm:px-6 sm:py-10">
@@ -133,9 +170,23 @@ const Register = () => {
                     placeholder="jane_doe"
                     required
                     value={username}
-                    onChange={(event) => setUsername(event.target.value)}
-                    className={inputClassName}
+                    onChange={(event) => {
+                      setUsername(event.target.value);
+                      setUsernameStatus('idle');
+                    }}
+                    aria-invalid={usernameStatus === 'taken'}
+                    aria-describedby={usernameStatus === 'idle' ? undefined : 'username-status'}
+                    className={`${inputClassName} ${usernameStatus === 'taken' ? 'border-red-500 focus:border-red-500 focus:ring-red-100' : ''}`}
                   />
+                  {usernameStatusMessage && (
+                    <p
+                      id="username-status"
+                      role={usernameStatus === 'taken' || usernameStatus === 'error' ? 'alert' : 'status'}
+                      className={`mt-1.5 text-sm ${usernameStatus === 'taken' || usernameStatus === 'error' ? 'text-red-600' : 'text-slate-500'}`}
+                    >
+                      {usernameStatusMessage}
+                    </p>
+                  )}
                 </div>
               </div>
 
