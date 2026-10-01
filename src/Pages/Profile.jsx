@@ -1,17 +1,12 @@
 import React from 'react'
 import useAuthStore from '../store/useAuthStore';
-import axios from 'axios';
+import api from '../api/axios';
 const Profile = () => {
 
   const userToken = useAuthStore((state) => state.token);
 
   React.useEffect(() => {
-    console.log("User Token:", userToken);
-    axios.get('http://localhost:8080/api/user-profile/profile-data', {
-      headers: {
-        'Authorization': `Bearer ${userToken}`
-      }
-    })
+    api.get('/user-profile/profile-data')
     .then((response) => {
       console.log("User Profile:", response.data);
     })
