@@ -1,4 +1,4 @@
-import api from "./axios";
+import api, { API_BASE_URL } from "./axios";
 
 const register = async (fullname, username, email, password) => {
     const response = await api.post("/auth/register", {fullname, username, email, password});
@@ -16,7 +16,7 @@ const login = async (username, password) => {
 }
 
 const googleAuth = () => {
-    window.location.assign("http://localhost:8080/oauth2/authorization/google");
+    window.location.assign(`${API_BASE_URL}/oauth2/authorization/google`);
 }
 
 export {register, checkUsernameAvailability, login, googleAuth};
