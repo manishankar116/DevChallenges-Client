@@ -1,14 +1,12 @@
-import { Link } from 'react-router-dom';
 import {
   BriefcaseBusiness,
   Check,
-  Eye,
-  ExternalLink,
   Lightbulb,
   Link2,
   LockKeyhole,
   MapPin,
 } from 'lucide-react';
+import { resolveProfileImageUrl } from '../api/userProfile';
 
 const ProfileDetailsPanel = ({ user }) => {
   if (!user) return null;
@@ -32,7 +30,7 @@ const ProfileDetailsPanel = ({ user }) => {
 
         {user.profileImageUrl ? (
           <img
-            src={user.profileImageUrl}
+            src={resolveProfileImageUrl(user.profileImageUrl)}
             alt={name}
             className="h-16 w-16 rounded-full object-cover"
           />

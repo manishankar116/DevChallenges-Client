@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import useAuthStore from '../store/useAuthStore';
+import { resolveProfileImageUrl } from '../api/userProfile';
 
 
 const IconSearch = (props) => (
@@ -96,7 +97,12 @@ const Navbar = ({ user, onMenuClick, isMenuOpen }) => {
         {isAuthenticated ? (
           <div className="flex items-center gap-3">
             <img
-              src={authUser?.avatarUrl || user?.avatarUrl || 'https://api.dicebear.com/7.x/avataaars/svg?seed=mani-shankar'}
+              src={
+                resolveProfileImageUrl(user?.profileImageUrl) ||
+                authUser?.avatarUrl ||
+                user?.avatarUrl ||
+                'https://api.dicebear.com/7.x/avataaars/svg?seed=mani-shankar'
+              }
               alt={displayName}
               className="h-9 w-9 rounded-full object-cover"
             />
