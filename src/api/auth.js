@@ -19,4 +19,9 @@ const googleAuth = () => {
     window.location.assign(`${API_BASE_URL}/oauth2/authorization/google`);
 }
 
-export {register, checkUsernameAvailability, login, googleAuth};
+const usernames = async () => {
+    const response = await api.get("/auth/usernames");
+    return response.data;
+};
+
+export {register, checkUsernameAvailability, login, googleAuth, usernames};

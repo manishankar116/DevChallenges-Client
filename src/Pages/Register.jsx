@@ -1,5 +1,5 @@
 import React from 'react';
-import { checkUsernameAvailability, googleAuth, register as registerUser } from '../api/auth';
+import { googleAuth, register as registerUser, usernames as getUsernames } from '../api/auth';
 
 const Register = () => {
   const [email, setEmail] = React.useState('');
@@ -18,7 +18,8 @@ const Register = () => {
     const timeoutId = window.setTimeout(async () => {
       setUsernameStatus('checking');
       try {
-        const available = await checkUsernameAvailability(username);
+        const existingUsernames = await getUsernames();
+        const available = !existingUsernames.includes(username);
         if (active) {
           setUsernameStatus(available ? 'available' : 'taken');
         }
