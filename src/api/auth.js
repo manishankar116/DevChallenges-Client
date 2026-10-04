@@ -16,7 +16,7 @@ const login = async (username, password) => {
 }
 
 const googleAuth = () => {
-    window.location.assign(`${API_BASE_URL}/oauth2/authorization/google`);
+    window.location.assign(`https://api.devchallenges.in/oauth2/authorization/google`);
 }
 
 const usernames = async () => {
