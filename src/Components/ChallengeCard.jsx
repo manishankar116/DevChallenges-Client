@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import { deleteChallenge } from '../api/challenge';
 import DeleteChallengeDialog from './DeleteChallengeDialog';
+import { MdOutlineModeEdit, MdOutlineDelete } from "react-icons/md";
 
 const IconEye = (props) => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
@@ -82,8 +83,12 @@ const ChallengeCard = ({challenge, onDelete, canManage, profileUsername}) => {
               </button>
               {canManage && (
                 <>
-                  <button type="button" onClick={() => handleEdit(challenge.challengeId)}>Edit</button>
-                  <button type="button" onClick={() => setIsDeleteDialogOpen(true)}>Delete</button>
+                  <button type="button" className="rounded-lg cursor-pointer bg-slate-100 p-2 text-slate-600 transition-colors hover:bg-slate-200" onClick={() => handleEdit(challenge.challengeId)}>
+                    <MdOutlineModeEdit />
+                  </button>
+                  <button type="button" className="rounded-lg cursor-pointer bg-slate-100 p-2 text-slate-600 transition-colors hover:bg-slate-200" onClick={() => setIsDeleteDialogOpen(true)}>
+                    <MdOutlineDelete />
+                  </button>
                 </>
               )}
             </div>

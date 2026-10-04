@@ -1,6 +1,6 @@
-import React from 'react'
 import { useLocation, useNavigate } from 'react-router-dom';
 import { getActiveSidebarItem } from '../utilities';
+import { resolveProfileImageUrl } from '../api/userProfile';
 
 
 const IconPlus = (props) => (
@@ -31,7 +31,7 @@ const IconSettings = (props) => (
   </svg>
 );
 
-const Sidebar = ({ user, stats, isLoggedIn, isOpen, onClose }) => {
+const Sidebar = ({ user, stats, isOpen, onClose }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const navItems = [
@@ -54,10 +54,11 @@ const Sidebar = ({ user, stats, isLoggedIn, isOpen, onClose }) => {
     <div className="flex flex-col items-center text-center">
         <img
           src={
+            resolveProfileImageUrl(user.profileImageUrl) ||
             user.avatarUrl ||
             "https://api.dicebear.com/7.x/avataaars/svg?seed=mani-shankar"
           }
-          alt={user.name}
+          alt={user.fullname || user.fullName || user.name || user.username}
           className="mb-4 h-28 w-28 rounded-full object-cover"
         />
 

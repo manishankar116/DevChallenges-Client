@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Navigate, useNavigate, useOutletContext, useParams } from "react-router-dom";
-import { updateProfile } from "../api/userProfile";
+import { resolveProfileImageUrl, updateProfile } from "../api/userProfile";
 
 /*export const user = {
     username: "mani_shankar",
@@ -20,47 +20,45 @@ export const profile = {
 
 export default function UpdateProfile() {
   const {user} = useOutletContext();
+  if (!user) {
+    return (
+      <div className="flex min-h-[calc(100vh-64px)] items-center justify-center">
+        <p className="text-sm text-slate-500">Loading profile...</p>
+      </div>
+    );
+  }
+
+  return <ProfileEditor key={user.username} user={user} />;
+}
+
+function ProfileEditor({ user }) {
   const {username} = useParams();
   const fileInputRef = useRef(null);
   const navigate = useNavigate();
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState("");
 
-  console.log(user);
-  
-
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState(() => ({
     username: user?.username || "",
-    fullName: user?.fullName || "",
+    fullName: user?.fullName || user?.fullname || "",
     email: user?.email || "",
-
     headline: user?.headline || "",
-    bio: user ?.bio || "",
-    currentCompany: user ?.currentCompany || "",
-    currentRole: user ?.currentRole || "",
-    location: user ?.location ||  "",
-    website: user ?.website || "",
-  });
-
-  const [profileImage, setProfileImage] = useState(
-    user?.profileImageUrl || null
-  );
-
+    bio: user?.bio || "",
+    currentCompany: user?.currentCompany || "",
+    currentRole: user?.currentRole || "",
+    location: user?.location || "",
+    website: user?.website || "",
+  }));
+  const [profileImage, setProfileImage] = useState(user?.profileImageUrl || null);
   const [selectedFile, setSelectedFile] = useState(null);
 
   useEffect(() => {
-    setFormData({
-      username: user?.username || "",
-      fullName: user?.fullname || "",
-      email: user?.email || "",
-      headline: user?.headline || "",
-      bio: user?.bio || "",
-      currentCompany: user?.currentCompany || "",
-      currentRole: user?.currentRole || "",
-      location: user?.location || "",
-      website: user?.website || "",
-    });
-
-    setProfileImage(user?.profileImageUrl || null);
-  }, [user]);
+    return () => {
+      if (profileImage?.startsWith("blob:")) {
+        URL.revokeObjectURL(profileImage);
+      }
+    };
+  }, [profileImage]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -80,30 +78,28 @@ export default function UpdateProfile() {
 
     if (!file) return;
 
-    // Maximum 5MB
     if (file.size > 5 * 1024 * 1024) {
-      alert("Profile picture must be smaller than 5MB.");
+      setSaveError("Profile picture must be 5 MB or smaller.");
+      e.target.value = "";
       return;
     }
 
-    // Only PNG/JPG/JPEG
-    const allowedTypes = ["image/png", "image/jpeg"];
+    const allowedTypes = ["image/png", "image/jpeg", "image/webp"];
 
     if (!allowedTypes.includes(file.type)) {
-      alert("Only PNG and JPG images are supported.");
+      setSaveError("Only PNG, JPG, and WebP images are supported.");
+      e.target.value = "";
       return;
     }
 
+    setSaveError("");
     setSelectedFile(file);
-
-    const imageUrl = URL.createObjectURL(file);
-    setProfileImage(imageUrl);
+    setProfileImage(URL.createObjectURL(file));
   };
 
   const handleRemoveImage = () => {
-    setProfileImage(null);
     setSelectedFile(null);
-
+    setProfileImage(user?.profileImageUrl || null);
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
@@ -111,14 +107,26 @@ export default function UpdateProfile() {
 
   const handleSubmit = async(e) => {
     e.preventDefault();
+    setIsSaving(true);
+    setSaveError("");
 
-    const data = {
-      ...formData,
-      profileImage: selectedFile,
-    };
-
-    await updateProfile(data)
-
+    try {
+      await updateProfile({
+        ...formData,
+        profileImage: selectedFile,
+      });
+      navigate(`/profile/${username}`, { replace: true });
+    } catch (error) {
+      const responseMessage = error.response?.data;
+      setSaveError(
+        (typeof responseMessage === "string" && responseMessage) ||
+        responseMessage?.detail ||
+        responseMessage?.message ||
+        "Could not update your profile. Please try again."
+      );
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const getInitials = () => {
@@ -132,17 +140,7 @@ export default function UpdateProfile() {
       .join("");
   };
 
-  if (!user) {
-    return (
-      <div className="flex min-h-[calc(100vh-64px)] items-center justify-center">
-        <p className="text-sm text-slate-500">
-          Loading profile...
-        </p>
-      </div>
-    );
-  }
-
-  if(user.username != username){
+  if (user.username !== username) {
     return <Navigate to={`/profile/${user.username}`}  replace/>
   }
 
@@ -175,7 +173,7 @@ export default function UpdateProfile() {
               <div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-full bg-slate-100">
                 {profileImage ? (
                   <img
-                    src={profileImage}
+                    src={resolveProfileImageUrl(profileImage)}
                     alt="Profile"
                     className="h-full w-full object-cover"
                   />
@@ -212,26 +210,27 @@ export default function UpdateProfile() {
                   </span>
 
                   <span className="mt-0.5 text-[10px] text-slate-400">
-                    PNG, JPG (Max 5MB)
+                    PNG, JPG, WebP (Max 5MB)
                   </span>
                 </button>
 
                 <input
                   ref={fileInputRef}
                   type="file"
-                  accept="image/png,image/jpeg"
+                  accept="image/png,image/jpeg,image/webp"
                   onChange={handleImageChange}
                   className="hidden"
                 />
 
-                <button
-                  type="button"
-                  onClick={handleRemoveImage}
-                  disabled={!profileImage}
-                  className="rounded-md border border-slate-200 px-5 py-2 text-xs font-semibold text-slate-600 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
-                >
-                  Remove
-                </button>
+                {selectedFile && (
+                  <button
+                    type="button"
+                    onClick={handleRemoveImage}
+                    className="rounded-md border border-slate-200 px-5 py-2 text-xs font-semibold text-slate-600 transition hover:bg-slate-50"
+                  >
+                    Undo image change
+                  </button>
+                )}
               </div>
             </div>
           </section>
@@ -502,6 +501,12 @@ export default function UpdateProfile() {
           </section>
 
           {/* ================= ACTIONS ================= */}
+          {saveError && (
+            <p role="alert" className="rounded-md bg-red-50 px-4 py-3 text-sm text-red-700">
+              {saveError}
+            </p>
+          )}
+
           <div className="flex justify-end gap-3 pb-4">
             <button
               type="button"
@@ -513,7 +518,8 @@ export default function UpdateProfile() {
 
             <button
               type="submit"
-              className="inline-flex items-center gap-2 rounded-md bg-blue-600 px-5 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-blue-700"
+              disabled={isSaving}
+              className="inline-flex items-center gap-2 rounded-md bg-blue-600 px-5 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-blue-700 disabled:cursor-wait disabled:opacity-60"
             >
               <svg
                 className="h-3.5 w-3.5"
@@ -529,7 +535,7 @@ export default function UpdateProfile() {
                 />
               </svg>
 
-              Save Changes
+              {isSaving ? "Saving..." : "Save Changes"}
             </button>
           </div>
         </form>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { demoChallenges, demoStats, demoUser } from './Home';
+import { demoChallenges } from './Home';
 import { useUserStore } from '../store/userStore';
 import { useEffect } from 'react';
 import { getChallenges } from '../api/challenge';
@@ -7,6 +7,7 @@ import {Navigate, useParams} from 'react-router-dom';
 import { getUserProfile} from '../api/userProfile';
 import useAuthStore from '../store/useAuthStore';
 import Feed from '../Components/Feed';
+import ProfileDetailsPanel from '../Components/ProfileDetailsPanel';
 
 export default function Main() {
   const [userDetails, setUserDetails] = React.useState(null);
@@ -53,7 +54,7 @@ export default function Main() {
   }, [fetchUser, isLoggedIn, username]);
   
   return (
-    <div>
+    <div className="flex items-start">
       <Feed
         challenges={challenges ? challenges : demoChallenges}
         totalCount={12}
@@ -62,6 +63,7 @@ export default function Main() {
         canManageChallenges={canManageChallenges}
         profileUsername={username}
       />
+      <ProfileDetailsPanel user={userDetails} />
     </div>
   );
 }
