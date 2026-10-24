@@ -7,6 +7,10 @@ export const getActiveSidebarItem = (pathname, username) => {
     return "Settings";
   }
 
+  if (pathname === `/profile/${username}/view`) {
+    return "View profile";
+  }
+
   if (pathname === `/profile/${username}`) {
     return "My Challenges";
   }

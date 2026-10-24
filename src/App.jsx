@@ -11,6 +11,7 @@ import UpdateProfile from './Components/UpdateProfile'
 import UpdateChallenge from './Pages/UpdateChallenge'
 import LandingPage from './LandingPage/LandingPage'
 import useAuthStore from './store/useAuthStore'
+import Profile from './Pages/Profile'
 
 function RequireAuth() {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
@@ -29,9 +30,10 @@ function App() {
             <Route path="/oauth2/success" element={<OAuth2Success />} />
             <Route path="/register" element={<Register />} />
             <Route path='/' element={<LandingPage />} />
-            
-            <Route element={<RequireAuth />}>
-              <Route element={<AppLayout />}>
+
+            <Route element={<AppLayout />}>
+              <Route path="/profile/:username/view" element={<Profile />} />
+              <Route element={<RequireAuth />}>
                 <Route path="/profile/:username" element={<Main />} />
                 <Route path="/profile/:username/update-profile" element={<UpdateProfile />} />
               </Route>

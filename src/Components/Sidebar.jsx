@@ -35,6 +35,7 @@ const Sidebar = ({ user, stats, isOpen, onClose }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const navItems = [
+    { label: "View profile", icon: IconUser, link: `/profile/${user.username}/view`},
     { label: "My Challenges", icon: IconFile, link: `/profile/${user.username}`},
     { label: "Edit Profile", icon: IconUser, link: `/profile/${user.username}/update-profile`},
     { label: "Settings", icon: IconSettings },
